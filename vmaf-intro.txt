@@ -1,0 +1,22 @@
+VMAF，即Video Muitimethod Assessment Fusion（视频多方法评价融合）；由 Netflix 推出的视频质量评价工具，用来解决传统指标不能反映多种场景、多种特征的视频情况。
+该指标是目前互联网视频最主流的客观视频评价指标，适用于衡量大规模环境中流播视频质量的观感。
+
+VMAF分数范围从 0 到 100，其中 0 表示最低质量，100表示最高。
+默认模型 v0.6.1 使用由绝对类别评分（ACR）方法收集的分数进行训练，该分数使用 1080p 显示屏，观看距离为3H。
+观看者对视频质量的评分为“很差”，“差”，“一般”，“好”和“优秀”，并且粗略地讲，“差”被映射为VMAF级别20，“优秀”为100。
+
+ffmpeg编译时需要打开--enable-libvmaf 才能使用vmaf功能。
+VMAF is now included as a filter in FFmpeg, and can be configured using: ./configure --enable-libvmaf. Refer to the Using VMAF with FFmpeg page.
+E:\goprj\workspace>ffmpeg
+ffmpeg version git-2020-06-26-7447045 Copyright (c) 2000-2020 the FFmpeg developers
+  built with gcc 9.3.1 (GCC) 20200621  //windows编译的ffmpeg默认是打开支持libvmaf的.
+  configuration: --disable-static --enable-shared --enable-gpl --enable-version3 --enable-sdl2 --enable-fontconfig --enable-gnutls --enable-iconv --enable-libass --enable-libdav1d --enable-libbluray --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libsrt --enable-libtheora --enable-libtwolame --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libzimg --enable-lzma --enable-zlib --enable-gmp --enable-libvidstab --enable-libvmaf --enable-libvorbis --enable-libvo-amrwbenc --enable-libmysofa --enable-libspeex --enable-libxvid --enable-libaom --enable-libgsm --disable-w32threads --enable-libmfx --enable-ffnvcodec --enable-cuda-llvm --enable-cuvid --enable-d3d11va --enable-nvenc --enable-nvdec --enable-dxva2 --enable-avisynth --enable-libopenmpt --enable-amf
+
+测试用例：
+用crf=23推一个高质量视频作为reference video。 rtmp://10.146.11.92/benchmark/720p，bitrate达到2.5Mbps左右。
+然后跟实际使用的720p进行对比，实际使用的720p，bitrate=500kbps。
+
+局限性：
+由于两个动态视频流很难在同一个timeline上准确对齐，在此，两个实时流的对比测试其实是不太准确的。结果仅供参考。
+
+testcase#1: python main.py rtsp://admin:pwd111@10.146.11.124:554/h264/ch1/main/av_stream rtsp://admin:pwd111@10.146.11.124:554/h264/ch1/stream3/av_stream
